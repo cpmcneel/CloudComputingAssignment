@@ -8,7 +8,7 @@ export default async function handler(
     res: NextApiResponse
 ) {
     try {
-        await prisma.user.delete({
+        await prisma.employee.delete({
             where: req.body,
     });
         res.status(200).json('success');

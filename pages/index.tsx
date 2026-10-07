@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 import {ColumnsType} from "antd/es/table";
 import {Button, Form, Input, message, Modal, Select, Space, Table, Tag} from "antd";
 import { faker } from '@faker-js/faker';
-import {User} from ".prisma/client";
+import {Employee} from ".prisma/client";
 const inter = Inter({ subsets: ['latin'] })
 
 const layout = {
@@ -17,14 +17,14 @@ const tailLayout = {
 };
 
 export default function Home() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
 
   const onFinish = async (values: any) => {
     console.log(values);
     setIsModalOpen(false);
-    fetch('/api/create_user', {
+    fetch('/api/create_employee', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -33,19 +33,19 @@ export default function Home() {
       body: JSON.stringify(values)
     }).then(async response => {
       if (response.status === 200) {
-        const user = await response.json();
-        message.success('created user ' + user.name);
-        setUsers([...users, user]);
+        const employee = await response.json();
+        message.success('created employee ' + employee.name);
+        setEmployees([...employees, employee]);
 
       } else message.error(
-          `Failed to create user:\n ${JSON.stringify(await response.json())}`);
+          `Failed to create employee:\n ${JSON.stringify(await response.json())}`);
     }).catch(res=>{message.error(res)})
   };
 
-  const onDelete = async (user: any) => {
-    const {id} = user;
+  const onDelete = async (employee: any) => {
+    const {id} = employee;
     setIsModalOpen(false);
-    fetch('/api/delete_user', {
+    fetch('/api/delete_employee', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -55,15 +55,15 @@ export default function Home() {
     }).then(async response => {
       if (response.status === 200) {
         await response.json();
-        message.success('Deleted user ' + user.name);
-        setUsers(users.filter(u=> u.id !== id ));
+        message.success('Deleted employee ' + employee.name);
+        setEmployees(employees.filter(u=> u.id !== id ));
 
       } else message.error(
-          `Failed to delete user:\n ${user.name}`);
+          `Failed to delete employee:\n ${employee.name}`);
     }).catch(res=>{message.error(res)})
   };
 
-  const columns: ColumnsType<User> = [
+  const columns: ColumnsType<Employee> = [
     {
       title: 'ID',
       dataIndex: 'id',
@@ -129,21 +129,21 @@ export default function Home() {
     form.resetFields();
   };
   useEffect(()=>{
-    fetch('api/all_user', {method: "GET"})
+    fetch('api/all_employee', {method: "GET"})
         .then(res => {
           res.json().then(
-              (json=> {setUsers(json)})
+              (json=> {setEmployees(json)})
           )
         })
   }, []);
 
-  if (!users) return "Give me a second";
+  if (!employees) return "Give me a second";
 
   return  <>
     <Button type="primary" onClick={showModal}>
-      Add User
+      Add Employee
     </Button>
-    <Modal title="Basic Modal" onCancel={handleCancel}
+    <Modal title="Create Employee" onCancel={handleCancel}
            open={isModalOpen} footer={null}  width={800}>
       <Form
           {...layout}
@@ -178,8 +178,8 @@ export default function Home() {
         </Form.Item>
       </Form>
     </Modal>
-    {/*<p>{JSON.stringify(users)}</p>*/}
-    <Table columns={columns} dataSource={users} />;
+    {/*<p>{JSON.stringify(employees)}</p>*/}
+    <Table columns={columns} dataSource={employees} />;
   </>;
 
 
